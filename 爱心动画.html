@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页版爱心提示动画</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            height: 100vh;
+            overflow: hidden;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+        .tip-box {
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "微软雅黑", sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // 提示语（可自定义）
+        const TIPS = ["保持好心情", "接接接", "谢谢", "想你啦", "加油", "么么哒", "要开心", "一起加油", "好运连连", "平安喜乐"];
+        // 清新浅色系（可自定义）
+        const COLORS = ["#FFE6F0", "#E6F7FF", "#F0FFF0", "#FFF8E6", "#FFE6E6", "#E6F3FF", "#FFF2E6", "#F5F0FF", "#E6FFFA", "#F9F0FF"];
+        // 心形缩放比例
+        const HEART_SCALE = 12;
+        // 弹出间隔（毫秒，数值越大越慢）
+        const POP_INTERVAL = 350;
+        // 淡入延迟（毫秒）
+        const FADE_IN_DELAY = 150;
+
+
+        // 生成心形坐标
+        function generateHeartPoints(num = 70) {
+            const points = [];
+            const screenW = window.innerWidth;
+            const screenH = window.innerHeight;
+            const centerX = screenW / 2;
+            const centerY = screenH / 2;
+
+            for (let t = 0; t < num; t++) {
+                const tRad = (t / num) * 2 * Math.PI;
+                // 心形参数方程
+                const x = 16 * Math.pow(Math.sin(tRad), 3);
+                const y = 13 * Math.cos(tRad) - 5 * Math.cos(2 * tRad) - 2 * Math.cos(3 * tRad) - Math.cos(4 * tRad);
+                
+                // 缩放+居中+随机偏移
+                const screenX = centerX + x * HEART_SCALE + (Math.random() * 10 - 5);
+                const screenY = centerY - y * HEART_SCALE + (Math.random() * 10 - 5);
+                
+                points.push({ x: screenX, y: screenY });
+            }
+            return points;
+        }
+
+
+        // 创建提示框
+        function createTipBox(point) {
+            const box = document.createElement("div");
+            box.className = "tip-box";
+            // 随机样式
+            box.style.backgroundColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+            box.textContent = TIPS[Math.floor(Math.random() * TIPS.length)];
+            // 定位到心形坐标
+            box.style.left = `${point.x - 40}px`;
+            box.style.top = `${point.y - 20}px`;
+            document.body.appendChild(box);
+            
+            // 淡入效果
+            setTimeout(() => {
+                box.style.opacity = 1;
+            }, FADE_IN_DELAY);
+            return box;
+        }
+
+
+        // 启动动画
+        function startHeartAnimation() {
+            const heartPoints = generateHeartPoints();
+            heartPoints.forEach((point, index) => {
+                // 逐个弹出，模拟拼接效果
+                setTimeout(() => {
+                    createTipBox(point);
+                }, index * POP_INTERVAL);
+            });
+        }
+
+
+        // 页面加载完成后启动
+        window.addEventListener("load", startHeartAnimation);
+    </script>
+</body>
+</html>
